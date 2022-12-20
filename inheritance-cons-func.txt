@@ -1,0 +1,47 @@
+<div dir="ltr" style="text-align: left;" trbidi="on">
+Object literal like<br />
+<br />
+var derived = {<br />
+&nbsp; &nbsp; a: 10<br />
+};<br />
+be easily extended using<br />
+derived.__proto__ = base;<br />
+where base is<br />
+<br />
+var base = {<br />
+&nbsp; &nbsp; x : 5<br />
+};<br />
+But, what if we using constructor function?<br />
+We need to do like this<br />
+<br />
+var Person = function (name) {<br />
+&nbsp; &nbsp; this.name = name;<br />
+}<br />
+Person.prototype.sayHello = function () {<br />
+&nbsp; &nbsp; console.log('Hello, I am '+this.name);<br />
+}<br />
+Person.prototype.getName = function () {<br />
+&nbsp; &nbsp; return this.name;<br />
+}<br />
+var per = new Person('Manan');<br />
+per.sayHello(); //prints --&gt; Hello, I am Manan<br />
+<br />
+var Employee = function (name, company) {<br />
+&nbsp; &nbsp; Person.call(this, name);<br />
+&nbsp; &nbsp; this.company = company;<br />
+}<br />
+Employee.prototype.sayHello = function () {<br />
+&nbsp; &nbsp; console.log('Hello, I am '+this.getName()+' and I am working at '+this.company);<br />
+}<br />
+Employee.prototype.__proto__ = Person.prototype;<br />
+var emp = new Employee('Manan', 'Integ');<br />
+emp.sayHello(); //prints --&gt; Hello, I am Manan and I am working at Integ<br />
+<br />
+Notice that we are calling Person function from Employee constructor function using Employee's this. This way whatever initializing properties of Person will be initialized and assigned to Employee's this. So Whatever properties should be in Person's object we have it in Employee's object.<br />
+<br />
+Now, properties assigned to Person.prototype we need to get that too. To do so we assigned Person.prototype to Employee.prototype.__proto__. This creates prototype chain of emp object like below and emp object can access properties of Person.prototype though the chain.<br />
+<br />
+emp<br />
+&nbsp; &nbsp; |----&nbsp; &nbsp;__proto__&nbsp; &nbsp;===&nbsp; Employee.prototype<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |----&nbsp; __proto__&nbsp; &nbsp;===&nbsp; Person.prototype<br />
+<br /></div>

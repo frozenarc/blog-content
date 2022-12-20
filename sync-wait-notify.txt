@@ -1,0 +1,111 @@
+<div dir="ltr" style="text-align: left;" trbidi="on">
+synchronized keyword in java used to make sure that the code block would be executed by one and only one thread at a time.<br />
+<br />
+Using the keyword one can write a code block which would be side effects free from other concurrently running thread.<br />
+<br />
+There are two way we can use the keyword: 1) synchronized block and 2) synchronized method.<br />
+<br />
+synchronized (lockingObject) {<br />
+&nbsp; &nbsp; // code which must be executed by single thread at a time.<br />
+}<br />
+<br />
+public synchronized void doWork () {<br />
+&nbsp; &nbsp; // code which must be executed by single thread at a time.<br />
+}<br />
+<br />
+The synchronized block locks on <i>lockingObject </i>whereas synchronized method locks on object of that method (<i>this</i>).<br />
+<br />
+Good example of this is to achieve singleton pattern.<br />
+<br />
+public class Singleton {<br />
+&nbsp; &nbsp; private static Singleton s;<br />
+&nbsp; &nbsp; public static Singleton getInstance () {<br />
+&nbsp; &nbsp; &nbsp; &nbsp; if ( s == null ) {<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; synchronized (Singleton.class) {<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if ( s == null ) {<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s = new Singleton();<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+&nbsp; &nbsp; &nbsp; &nbsp; }<br />
+&nbsp; &nbsp; &nbsp; &nbsp; return s;<br />
+&nbsp; &nbsp; }<br />
+}<br />
+<br />
+Let's understand this in little bit more detail.<br />
+<br />
+Suppose, thread 1 enter into getInstance method and pass first if condition. It enters into synchronized block and at the same time thread 2 enters into getInstance. Thread 1 passes second if&nbsp;condition too. Thread 2 stops at synchronized block because thread 1 already obtained lock on Singleton.class object. Now, thread 1 creates object and exits the block, so lock is released. Thread 2 can enter into synchronized block now. Thread 2 checks the second if condition but it is false and it gets same object which created by thread 1.<br />
+<br />
+You might be wondering why there are two if statement. Only one inside the synchronized block can achieve our goal. But synchronization is expensive operation, so every time some thread try to create instance, we should not lock&nbsp;<i>Singleton.class</i>&nbsp;object.<br />
+<br />
+Now, we can come to <i>wait()</i> and <i>notify()</i>.<br />
+<br />
+There is some scenario where we need to wait for some data required for further processing, which would be prepared by other thread. So, we need to wait for that other thread to complete its task.<br />
+<br />
+Thread 1:<br />
+<br />
+synchronized (lock) {<br />
+&nbsp; &nbsp; /* Thread 2 cannot enter its synchronized block because thread 1 already entered */<br />
+&nbsp; &nbsp; /* Doing something */<br />
+&nbsp; &nbsp; lock.wait(); /* Waiting for thread 2 to finish its task. Now thread 2 can enter its synchronized block */<br />
+&nbsp; &nbsp; /* Once the thread is notified, the code block would be executed using data prepared by thread 2 */<br />
+}<br />
+<br />
+Thread 2:<br />
+<br />
+synchronized (lock) {<br />
+&nbsp; &nbsp; /* Entering into the block because thread 1 is waiting */<br />
+&nbsp; &nbsp; /* Preparing data for thread 1 */<br />
+&nbsp; &nbsp; lock.notify(); /* Notifies thread 1 that data required by it is ready now, it can start further execution /*<br />
+}<br />
+<br />
+Ok.. so once we wait on some lock, the lock get released by the waiting thread. So other (notifying) thread can enters into its synchronized block locked by the locking object.<br />
+<br />
+Once notifying thread finishes its task it can notify waiting thread on the locking object and sends a signal that once the thread exits from its synchronized block the waiting thread can gain lock on that object and can resume further execution.<br />
+<br />
+Here is a tricky part with notify() and notifyAll() methods. It cannot release lock as soon as it is called. But, lock would be released once the synchronized block finishes its execution. The methods just send signal that waiting thread can obtain lock once the notifying&nbsp;thread release it.<br />
+<br />
+Let's see pseudo code of Producer - Consumer problem.<br />
+<br />
+class Producer {<br />
+&nbsp; &nbsp; public void produce() {<br />
+&nbsp; &nbsp; &nbsp; &nbsp; for ( loop forever ) {<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; synchronized ( queue ) {<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if ( queue.isFull() ) {<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; queue.wait();<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; } else {<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; queue.push(data);<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; queue.notify();<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+&nbsp; &nbsp; &nbsp; &nbsp; }<br />
+&nbsp; &nbsp; }<br />
+}<br />
+<br />
+class Consumer {<br />
+&nbsp; &nbsp; public void consume() {<br />
+&nbsp; &nbsp; &nbsp; &nbsp; for ( loop forever ) {<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; synchronized ( queue ) {<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if ( queue.isEmpty() ) {<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; queue.wait();<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; } else {<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; queue.pop();<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; queue.notify();<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+&nbsp; &nbsp; &nbsp; &nbsp; }<br />
+&nbsp; &nbsp; }<br />
+}<br />
+<br />
+Producer starts producing data into queue and consumer starts consuming. If queue is full than producer needs to wait for consumer to make it little empty so producer can carry on its task.<br />
+<br />
+The pseudo code says that both have synchronized block on queue object. So at a time any one of them can write to it or read from it.<br />
+<br />
+If queue is full, producer calls wait on it so consumer can enter into its synchronized block and consumes. Once consumer consumes data, queue becomes empty for one element. Consumer calls notify and sends signal to waiting producer that "Queue is little empty now you can start further processing as soon as I release lock on queue." So once synchronized block exits and releases lock, the producer can obtain lock and start producing.<br />
+<br />
+The same happens when queue become empty and consumer need to wait for producer. Once producer produce something it notifies consumer to start consuming as soon as it exits synchronized block.<br />
+<br />
+You might have noticed that suppose thread 2 first enters into its synchronized block and calls notify, what would happen. Producer every time calls notify after producing and consumer might not even waiting at that time, what would happen.<br />
+<br />
+The notify signal simply ignored in this scenario. It is just effective if some thread is waiting on same locking object.<br />
+<br />
+I hope that wait, notify and synchronization is clear now.</div>

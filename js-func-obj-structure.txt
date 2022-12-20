@@ -1,0 +1,170 @@
+<div dir="ltr" style="text-align: left;" trbidi="on">
+Javascript has function and object structure. We tries to understand this.<br />
+<br />
+Function is an object and an object is created by some function.<br />
+<br />
+When a function creates an object, the function assign its prototype value to __proto__ property of newly created object.<br />
+<br />
+<i>Object.prototype&nbsp;</i>is the last object in prototype chain. It is base object for all functions and objects.<br />
+<br />
+Javascript has pattern that __proto__ of function would be type of function and __proto__ of object would be type of object. This is also true for Number, Array etc.<br />
+<br />
+Lets check diagram of javascript function and object&nbsp;structure.<br />
+(We shall call in-built unnamed function as <i>System function</i>.)<br />
+<br />
+<div class="separator" style="clear: both; text-align: center;">
+<a href="https://1.bp.blogspot.com/-2YqrIt0bWyU/Wp-ULnrbWoI/AAAAAAAAAb0/-WEBjHXrD-0F6PbTjc9kn14sriFG0uljQCLcBGAs/s1600/JS-2%2B%25287%2529%2B%25284%2529.png" imageanchor="1" style="margin-left: 1em; margin-right: 1em;"><img border="0" data-original-height="871" data-original-width="672" src="https://1.bp.blogspot.com/-2YqrIt0bWyU/Wp-ULnrbWoI/AAAAAAAAAb0/-WEBjHXrD-0F6PbTjc9kn14sriFG0uljQCLcBGAs/s1600/JS-2%2B%25287%2529%2B%25284%2529.png" /></a></div>
+<br />
+<div class="separator" style="clear: both;">
+If we create <i>obj</i> using object literal,</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+var obj = { a: 0 };</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+The <i>obj</i> is created by <i>Object</i>. Here,&nbsp;the <i>Object</i> function is used implicitly as creator function.</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+obj.__proto__ === Object.prototype&nbsp; &nbsp;// true</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+If we create an instance using creator function.</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+var foo = new Foo();</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+The <i>foo</i> is created by <i>Foo</i>.</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+foo__proto__ === Foo.prototype&nbsp; &nbsp;// true</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+Now, <i>Foo</i> also is an object (functional-object). Who creates <i>Foo</i>?</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+<i>Foo</i> is created by <i>Function</i>.</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+When we write like this.</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+var Foo = function () {</div>
+<div class="separator" style="clear: both;">
+};</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+The <i>Function</i>&nbsp;acts as creator function and creates <i>Foo</i> object.</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+Foo.__proto__ === Function.prototype&nbsp; &nbsp;// true</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+Now, who creates <i>Function</i>? Before asking the question lets ask who creates <i>Object</i>?</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+The <i>Object</i> is a creator function to create other objects. So it is also created by <i>Function</i>.</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+Object.__proto__ === Function.prototype&nbsp; &nbsp;// true</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+Ok. now who creates <i>Function</i>?&nbsp;</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+Actually <i>Function</i> creates itself!!!</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+This seems weird and it is actually. Javascript tries to emerge one pattern. It is not right internally though that Function creates itself.</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+Function.__proto__ === Function.prototype&nbsp; &nbsp;// true</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+If you look&nbsp;closely the above diagram you will see that.</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+Foo.__proto__ === Function.__proto__ === Object.__proto__&nbsp; &nbsp;//true</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+Here, <i>Foo</i>, <i>Function</i> and <i>Object</i> all are functions and functions always have __proto__ of type function.</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+So if we do</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+console.log(Function.__proto__)</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+We would see something like this</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+function () { [native code] }</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+This is inbuilt unnamed function (<i>System function</i>) what is assigned to __proto__ of any of type functional-object.</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+Now, who creates <i>System function</i>?</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+Function.__proto__.__proto__ === Object.prototype&nbsp; &nbsp;// true</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+This is strange. <i>System function</i> (<i>Function.__proto__</i>) is created by <i>Object</i> and <i>Object</i> is created by <i>Function</i>. This is a cyclic referencing. Something is first and something is last. Javascript assign either&nbsp;<i>Function.__proto__.__proto__</i> or <i>Object.__proto__</i> later to mimic the cycle.</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+This design is to make <i>Object.prototype</i> last object in prototype chain.</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+But, here <i>System function</i> is a type of function and its __proto__ should be a type of function not a type of object. But, the function's __proto__ is Object.prototype.</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+But, anyways some function has to have <i>Object.prototype</i> as __proto__ of itself at the end. Because eventually all needs to end at <i>Object.prototype</i>.</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+Ok... Who created <i>Object.prototype</i>? The object's __proto__ is null. So it seems no one creates it.</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+Object.prototype.__proto__&nbsp; &nbsp;// null</div>
+<div class="separator" style="clear: both;">
+<br /></div>
+<div class="separator" style="clear: both;">
+Same way, does&nbsp;<i>System function</i> create anything? The function's prototype is undefined. So it seems it doesn't create anything.</div>
+</div>

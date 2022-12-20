@@ -1,0 +1,93 @@
+<div dir="ltr" style="text-align: left;" trbidi="on">
+this keyword used to reference current object in javascript. There are two scenario where current object is determined differently.<br />
+<br />
+* Calling object represented by `this` in function.<br />
+<br />
+* Arrow function can reference object where the function defined.<br />
+<br />
+To demonstrate the above scenarios we shall take some examples.<br />
+<br />
+Suppose,<br />
+<br />
+var x = 10;<br />
+<br />
+(function() {<br />
+&nbsp; &nbsp;console.log(this.x);<br />
+})() // 10<br />
+<br />
+(() =&gt; {<br />
+&nbsp; &nbsp;console.log(this.x);<br />
+})() // 10<br />
+<br />
+There are two self executing functions both resulted in "10". At first look it seems behaving same, but there is basic deference what we going to see.<br />
+<br />
+const xObj = {<br />
+&nbsp; &nbsp; value: 10,<br />
+&nbsp; &nbsp; getValue: () =&gt; {<br />
+&nbsp; &nbsp; &nbsp; &nbsp; return this.value;<br />
+&nbsp; &nbsp; }<br />
+};<br />
+<br />
+const yObj = {<br />
+&nbsp; &nbsp; value: 10,<br />
+&nbsp; &nbsp; getValue: function () {<br />
+&nbsp; &nbsp; &nbsp; &nbsp; return this.value;<br />
+&nbsp; &nbsp; }<br />
+};<br />
+<br />
+xObj.getValue(); // undefined<br />
+yObj.getValue(); // 10<br />
+<br />
+Why undefined for `xObj`? Because arrow function is defined under object literal which is not a function itself. Object literal is not a function definition so `this` used inside object literal will not refer to the object. We can say that the arrow function is defined under global function, so `this` inside the arrow function points to global not to `xObj`.<br />
+<br />
+`yObj`'s `getValue` points to its calling object. Here it is `yObj` own self.<br />
+<br />
+Suppose there is<br />
+<br />
+const zObj = {<br />
+&nbsp; &nbsp; value: 20<br />
+};<br />
+<br />
+zObj.getValue = yObj.getValue;<br />
+<br />
+zObj.getValue(); // 20<br />
+<br />
+`zObj` becomes calling object for normal function `getValue`, so `this` inside the function refers to `zObj`.<br />
+<br />
+Arrow function statically binds to `this` where the arrow function is created. Arrow function is not seems useful when used with object literal defined in global context but it is helpful in some situation when we are using functional constructor to create object.<br />
+<br />
+const xFunc = function () {<br />
+&nbsp; &nbsp; this.value = 10;<br />
+&nbsp; &nbsp; this.getValueArrow = () =&gt; {<br />
+&nbsp; &nbsp; &nbsp; &nbsp; return this.value;<br />
+&nbsp; &nbsp; };<br />
+&nbsp; &nbsp; this.getValueNormal = function () {<br />
+&nbsp; &nbsp; &nbsp; &nbsp; return this.value;<br />
+&nbsp; &nbsp; };<br />
+};<br />
+<br />
+const xf = new xFunc();<br />
+<br />
+xf.getValueArrow() // 10<br />
+<br />
+xf.getValueNormal(); // 10<br />
+<br />
+Here, both calling object and object in which the functions defined are same. So, it looks like both function works same way, but they aren't.<br />
+<br />
+const yFunc = function () {<br />
+&nbsp; &nbsp; this.value = 20;<br />
+};<br />
+<br />
+const yf = new yFunc();<br />
+<br />
+yf.getValueArrow = xf.getValueArrow;<br />
+<br />
+yf.getValueNormal = xf.getValueNormal;<br />
+<br />
+yf.getValueArrow(); // 10<br />
+<br />
+yf.getValueNormal(); // 20<br />
+<br />
+Here `getValueArrow` function's `this` will statically bind to object created by functional constructor where the arrow function defined in, so it resulted in "10" as value from statically bounded `this`.<br />
+<br />
+Whereas `getValueNormal` function's `this` will dynamically bind to calling object and reflects values from it.&nbsp;</div>

@@ -1,0 +1,20 @@
+<div dir="ltr" style="text-align: left;" trbidi="on">
+The question asked lot of time to lot of people. Each has some reasons for immutability of java strings.<br />
+<br />
+Java has primitive types which are inherently immutable.<br />
+<br />
+int i = 0;<br />
+void changeValue(int val) {<br />
+&nbsp; &nbsp; val = 1;<br />
+}<br />
+changeValue(i);<br />
+<br />
+Value of "i" is still 0.<br />
+<br />
+The same way strings are just sequence of character. It should be primitive as well. It brings peace of mind with it.<br />
+<br />
+As primitive has&nbsp;+ and - operations strings also have concatenation and substring operations. String is not primitive so java has workaround for it and made it feels like primitive.<br />
+<br />
+All this lead us to immutable string object.<br />
+<br />
+The same rules applied to other java objects like. All wrapper classes (Integer, Float etc.), BigDecimal, BigInteger, Color etc.&nbsp;</div>

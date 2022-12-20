@@ -1,0 +1,122 @@
+<div dir="ltr" style="text-align: left;" trbidi="on">
+<div dir="ltr" style="text-align: left;" trbidi="on">
+List&lt;Double&gt; or List&lt;Float&gt; cannot be assigned to List&lt;Number&gt; because, List&lt;Double&gt; isn't extend List&lt;Number&gt;.<br />
+<pre>List&lt;Double&gt; dblList = new ArrayList&lt;&gt;();
+List&lt;Number&gt; numList = dblList; //illegal</pre>
+To do that we need to use upper-bound wild card.<br />
+<pre>List&lt;Double&gt; dblList = new ArrayList&lt;&gt;();
+List&lt;? extends Number&gt; numList = dblList;</pre>
+Same way List&lt;Number&gt; isn't extend List&lt;Object&gt; so, List&lt;Object&gt; cannot be assigned to List&lt;Number&gt;<br />
+<pre>List&lt;Object&gt; objList = new ArrayList&lt;&gt;();
+List&lt;Number&gt; numList = objList; //illegal</pre>
+To do that we need to use lower-bound wild card
+<br />
+<pre>List&lt;Object&gt; objList = new ArrayList&lt;&gt;();
+List&lt;? super Number&gt; numList = objList;</pre>
+<br />
+<b>Upper-bound</b><br />
+<br />
+We can add object of Double type or its sub types to List&lt;Double&gt;.<br />
+Same way we can add Number or its sub types (e.g. Double, Float, Integer) to List&lt;Number&gt; but, we cannot assign dblList to numList. Why?<br />
+The reason is that we can add any sub type of Number to numList and numList is just a reference of dblList so that sub type would actually be added in dblList, if that sub-type is Integer or Float than it is problem.<br />
+<pre>List&lt;Number&gt; numList = dblList; //Suppose this is possible then
+numList.add(new Integer(1)); // this is not solving purpose of List&lt;Double&gt;
+numList.add(new Float(3.2)); //same as above</pre>
+That's why above assignment made illegal by java compiler.<br />
+Now if we do this...
+<br />
+<pre>List&lt;? extends Number&gt; numList = dblList; // Legal</pre>
+then also above scenario would be happenned... so, compiler made illegal to accept value in any of the method where type declared with &lt;? extends SomeClass&gt;<br />
+<pre>class MyContainer&lt;T&gt; {
+&nbsp; &nbsp; ...
+&nbsp; &nbsp; public void accept(T value) {
+&nbsp; &nbsp; &nbsp; &nbsp; ...
+&nbsp; &nbsp; }
+&nbsp; &nbsp; ...
+}
+</pre>
+If we declare reference of MyContainer&lt;? extends Number&gt; then any method like "accept" which accepts "T" as parameter is illegal on that reference.<br />
+<pre>numList.add(new Integer(1)); //illegal
+numList.add(new Double(2.34)); //illegal!</pre>
+So, what's the use of upper-bound wild card?<br />
+It is used to get data from container, not to add data to container.<br />
+When we do like this..
+<br />
+<pre>Number value = numList.get(0);</pre>
+We are sure here that at least we get Number from numList because it has Number or sub-types of it but, if compiler allow to call add on numList reference then below situation can be occurred.<br />
+<pre>List&lt;? extends Number&gt; numList = dblList;
+numList.add(new Integer(4)); //This is not logical, so compiler don't want to arise this situation</pre>
+<b><br /></b>
+<b>Lower-bound</b><br />
+<br />
+Lower-bond is used to add data to container but when we try to get data from container it returns us Object.<br />
+Let's see why.<br />
+<pre>List&lt;Object&gt; objList = new ArrayList&lt;&gt;();
+List&lt;? super Number&gt; numList = objList;</pre>
+Here it doesn't mean we can add Number or any of its super type to container. No.<br />
+We only allowed to add Number and its sub-types to numList then, what's use of it?<br />
+<br />
+We can pass List&lt;Object&gt;, List&lt;Serializable&gt; to method which accepts List&lt;? super Number&gt;.<br />
+That way once the method finishes adding values to container we have a container to perform specific operation on.<br />
+<pre>public void addValues(List&lt;? super Number&gt; numList) {
+&nbsp; &nbsp;for(int i = 0; i &lt; 10; i ++) {
+&nbsp; &nbsp; &nbsp; &nbsp;numList.add(i);
+&nbsp; &nbsp;}
+}
+
+public void customSerializationOfList(List&lt;Serializable&gt; serList) {
+&nbsp; &nbsp;for(Serializable ser : serList) {      
+&nbsp; &nbsp;&nbsp; &nbsp;...
+&nbsp; &nbsp;&nbsp; &nbsp;ObjectOutputStream oos = ...
+&nbsp; &nbsp;&nbsp; &nbsp;oos.writeObject(ser);
+&nbsp; &nbsp;&nbsp; &nbsp;...
+&nbsp; &nbsp;}
+}
+
+public void customPrintingOfList(List&lt;Object&gt; objList) {
+&nbsp; &nbsp;for(Object obj : objList) {
+&nbsp; &nbsp;&nbsp; &nbsp;System.out.println("**** Obj: "+obj.toString()+" ****");
+&nbsp; &nbsp;}
+}
+public void operateForObjectList() {
+&nbsp; &nbsp;List&lt;Object&gt; objList = new ArrayList&lt;&gt;();
+&nbsp; &nbsp;addValues(objList);
+&nbsp; &nbsp;customPrintingOfList(objList);
+}
+
+public void operateForSerializableList() {
+&nbsp; &nbsp;List&lt;Serializable&gt; serList = new ArrayList&lt;&gt;();
+&nbsp; &nbsp;addValues(serList);
+&nbsp; &nbsp;customSerializationOfList(serList);
+}</pre>
+Here, our purpose is to use general method customSerializationOfList which can be used from any other part of application with List&lt;String&gt;, List&lt;Color&gt; etc. Here, if we try to get value from numList it always returns Object type because, it doesn't know which super type of Number the container is of.&nbsp;</div>
+It can be any super type of list as shown in above case so it always resolves to base class Object.
+<br />
+<br />
+<b>Unbounded</b><br />
+<br />
+Unbounded type is unknown type with no binding information.<br />
+<pre>List&lt;?&gt; unList = new ArrayList&lt;&gt;();</pre>
+Any kind of List can be assigned to unList reference. We cannot add value to container pointed by unList type of reference and if we try to get value from unList type of reference it always resolves to Object.<br />
+<br />
+This is used when we want value of container just to be Object but we cannot declare it as List&lt;Object&gt; specifically<br />
+<pre>public List&lt;? super Number&gt; getList() {
+&nbsp; &nbsp; ...
+}
+
+public void doSomethingOnList(List&lt;?&gt; objList) {
+&nbsp; &nbsp;for(Object obj : objList) {
+&nbsp; &nbsp; &nbsp; //do something on each obj
+&nbsp; &nbsp;}
+}
+
+List&lt;?&gt; unList = getList();
+doSomethingOnList(unList);
+</pre>
+We can pass reference of List&lt;Object&gt; to doSomethingOnList method
+<br />
+<pre>List&lt;Object&gt; objList = new ArrayList&lt;&gt;();
+doSomethingOnList(objList);</pre>
+but,<br />
+<pre>List&lt;Object&gt; objList = getList(); //illegal</pre>
+</div>
